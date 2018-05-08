@@ -1,6 +1,8 @@
 from telethon import TelegramClient
 from telethon.errors import ChannelPrivateError
 
+# Import api_id and api_hash from private.py
+# Provide that file on your own
 import private
 
 client = TelegramClient("session1", private.api_id, private.api_hash)
