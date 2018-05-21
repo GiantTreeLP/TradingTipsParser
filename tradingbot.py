@@ -31,16 +31,23 @@ def print_channel_message(message: Message) -> None:
 
 
 def print_message(entity: Optional[User], date: datetime.date, message: str) -> None:
-    print(date.strftime("(%Y-%m-%d %H:%M:%S) "), end="")
+    indent = 0
+    date_str = date.strftime("(%Y-%m-%d %H:%M:%S) ")
+    indent += len(date_str)
+    print(date_str, end="")
     if entity:
         if entity.username:
+            indent += len(entity.username)
             print(entity.username, end="")
         else:
+            indent += len(entity.first_name)
             print(entity.first_name + " ", end="")
             if entity.last_name:
+                indent += len(entity.last_name)
                 print(entity.last_name, end="")
+    indent += 2
     print(": ", end="")
-    print(re.sub('\r?\n', '\r\n', message), flush=True)
+    print(re.sub('\r?\n', '\r\n' + (' ' * indent), message), flush=True)
 
 
 def handle_messages(update):
