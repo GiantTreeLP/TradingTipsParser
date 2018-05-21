@@ -1,8 +1,10 @@
+import datetime
 import hashlib
-from typing import Union
+import re
+from typing import Union, Optional
 
 from telethon import TelegramClient, ConnectionMode
-from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, UpdateNewMessage, User
+from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, UpdateNewMessage, User, Message
 
 # Import api_id and api_hash from private.py
 # Provide that file on your own
@@ -16,38 +18,35 @@ def get_entity(entity_id: Union[str, int]) -> User:
         print(e)
 
 
-def print_message(message):
-    print(message.date.strftime("(%Y-%m-%d %H:%M:%S) "), end="")
-    entity = get_entity(message.user_id)
-    if entity.username:
-        print(entity.username, end="")
-    else:
-        print(entity.first_name, end="")
-        if entity.last_name:
-            print(" " + entity.last_name, end="")
+def print_private_message(message: Union[UpdateShortMessage, UpdateNewMessage]) -> None:
+    if message.user_id:
+        entity = get_entity(message.user_id)
+    print_message(entity, message.date, message.message)
 
+
+def print_channel_message(message: Message) -> None:
+    if message.from_id:
+        entity = get_entity(message.from_id)
+    print_message(entity, message.date, message.message)
+
+
+def print_message(entity: Optional[User], date: datetime.date, message: str) -> None:
+    print(date.strftime("(%Y-%m-%d %H:%M:%S) "), end="")
+    if entity:
+        if entity.username:
+            print(entity.username, end="")
+        else:
+            print(entity.first_name + " ", end="")
+            if entity.last_name:
+                print(entity.last_name, end="")
     print(": ", end="")
-    print(message.message, flush=True)
-
-
-def print_channel_message(message):
-    print(message.date.strftime("(%Y-%m-%d %H:%M:%S) "), end="")
-    entity = get_entity(message.from_id)
-    if entity.username:
-        print(entity.username, end="")
-    else:
-        print(entity.first_name + " ", end="")
-        if entity.last_name:
-            print(entity.last_name, end="")
-
-    print(": ", end="")
-    print(message.message, flush=True)
+    print(re.sub('\r?\n', '\r\n', message), flush=True)
 
 
 def handle_messages(update):
     print("Got %s" % update)
     if isinstance(update, (UpdateShortMessage, UpdateNewMessage)) and not update.out:
-        print_message(update)
+        print_private_message(update)
     elif isinstance(update, UpdateNewChannelMessage) and not update.message.out:
         print_channel_message(update.message)
 
