@@ -4,14 +4,15 @@ import re
 from typing import Union, Optional
 
 from telethon import TelegramClient, ConnectionMode
-from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, UpdateNewMessage, User, Message, PeerChannel
+from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, UpdateNewMessage, User, Message, Channel, \
+    Chat
 
 # Import api_id and api_hash from private.py
 # Provide that file on your own
 import private
 
 
-def get_entity(entity_id: Union[str, int]) -> User:
+def get_entity(entity_id: Union[str, int]) -> Union[User, Chat, Channel]:
     try:
         return client.get_entity(entity_id)
     except Exception as e:
@@ -33,7 +34,7 @@ def print_channel_message(message: Message) -> None:
     print_message(entity, message.date, message.message)
 
 
-def print_message(entity: Optional[Union[User, PeerChannel]], date: datetime.date, message: str) -> None:
+def print_message(entity: Optional[Union[User, Chat, Channel]], date: datetime.date, message: str) -> None:
     indent = 0
     date_str = date.strftime("(%Y-%m-%d %H:%M:%S) ")
     indent += len(date_str)
