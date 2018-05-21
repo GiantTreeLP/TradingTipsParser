@@ -33,7 +33,7 @@ def print_channel_message(message: Message) -> None:
     print_message(entity, message.date, message.message)
 
 
-def print_message(entity: Optional[User, PeerChannel], date: datetime.date, message: str) -> None:
+def print_message(entity: Optional[Union[User, PeerChannel]], date: datetime.date, message: str) -> None:
     indent = 0
     date_str = date.strftime("(%Y-%m-%d %H:%M:%S) ")
     indent += len(date_str)
@@ -79,6 +79,11 @@ if __name__ == '__main__':
     client.session.report_errors = False
     client.start(phone=phone_num)
     print(client.get_me())
+
+    # entity = get_entity("https://t.me/livetrends")
+    #
+    # for message in client.iter_messages(entity, limit=10):
+    #     print_message(entity, message.date, message.message)
 
     client.add_event_handler(handle_messages)
     client.idle()
