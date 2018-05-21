@@ -4,7 +4,7 @@ import re
 from typing import Union, Optional
 
 from telethon import TelegramClient, ConnectionMode
-from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, UpdateNewMessage, User, Message
+from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, UpdateNewMessage, User, Message, PeerChannel
 
 # Import api_id and api_hash from private.py
 # Provide that file on your own
@@ -19,6 +19,7 @@ def get_entity(entity_id: Union[str, int]) -> User:
 
 
 def print_private_message(message: Union[UpdateShortMessage, UpdateNewMessage]) -> None:
+    entity = None
     if message.user_id:
         entity = get_entity(message.user_id)
     print_message(entity, message.date, message.message)
@@ -27,10 +28,12 @@ def print_private_message(message: Union[UpdateShortMessage, UpdateNewMessage]) 
 def print_channel_message(message: Message) -> None:
     if message.from_id:
         entity = get_entity(message.from_id)
+    else:
+        entity = client.get_entity(message.to_id)
     print_message(entity, message.date, message.message)
 
 
-def print_message(entity: Optional[User], date: datetime.date, message: str) -> None:
+def print_message(entity: Optional[User, PeerChannel], date: datetime.date, message: str) -> None:
     indent = 0
     date_str = date.strftime("(%Y-%m-%d %H:%M:%S) ")
     indent += len(date_str)
@@ -39,6 +42,9 @@ def print_message(entity: Optional[User], date: datetime.date, message: str) -> 
         if entity.username:
             indent += len(entity.username)
             print(entity.username, end="")
+        elif entity.title:
+            indent += len(entity.title)
+            print(entity.title, end="")
         else:
             indent += len(entity.first_name)
             print(entity.first_name + " ", end="")
@@ -62,6 +68,7 @@ if __name__ == '__main__':
     phone_num = input("Please enter your phone number: ")
     md5_hash = hashlib.md5()
     md5_hash.update(phone_num.encode("utf-8"))
+    print("Using session '%s'" % md5_hash.hexdigest())
     client = TelegramClient(session=md5_hash.hexdigest(),
                             api_id=private.api_id,
                             api_hash=private.api_hash,
