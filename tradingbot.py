@@ -64,6 +64,8 @@ def handle_messages(update):
         print_private_message(update)
     elif isinstance(update, UpdateNewChannelMessage) and not update.message.out:
         print_channel_message(update.message)
+    if update.message.media:
+        client.download_media(update.message, "media/")
 
 
 if __name__ == '__main__':
