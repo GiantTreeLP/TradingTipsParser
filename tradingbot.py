@@ -68,11 +68,18 @@ def handle_messages(update):
         client.download_media(update.message, "media/")
 
 
-if __name__ == '__main__':
+def handle_cli(line: str) -> None:
+    if line == "stop":
+        client.disconnect()
+        exit(0)
+
+
+def main():
     phone_num = input("Please enter your phone number: ")
     md5_hash = hashlib.md5()
     md5_hash.update(phone_num.encode("utf-8"))
     print("Using session '%s'" % md5_hash.hexdigest())
+    global client
     client = TelegramClient(session=md5_hash.hexdigest(),
                             api_id=private.api_id,
                             api_hash=private.api_hash,
@@ -83,15 +90,20 @@ if __name__ == '__main__':
     client.start(phone=phone_num)
     print(client.get_me())
 
-    # entity = get_entity("https://t.me/livetrends")
-    #
-    # for message in client.iter_messages(entity, limit=10):
-    #     print_message(entity, message.date, message.message)
+    trend_channel = get_entity("https://t.me/livetrends")
+    print(trend_channel)
+
+    for message in client.iter_messages(trend_channel, limit=10):
+        if message.to_id.channel_id == trend_channel.id:
+            print_message(trend_channel, message.date, message.message)
 
     client.add_event_handler(handle_messages)
     while True:
         line = input("> ")
         print(line)
-        if line == "stop":
-            client.disconnect()
-            exit(0)
+        handle_cli(line)
+
+
+if __name__ == '__main__':
+    client = None
+    main()
