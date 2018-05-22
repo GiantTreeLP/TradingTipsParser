@@ -3,7 +3,8 @@ import hashlib
 import re
 from typing import Union, Optional
 
-from telethon import TelegramClient, ConnectionMode
+from telethon import TelegramClient
+from telethon.network import ConnectionTcpObfuscated
 from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, UpdateNewMessage, User, Message, Channel, \
     Chat
 
@@ -73,10 +74,9 @@ if __name__ == '__main__':
     client = TelegramClient(session=md5_hash.hexdigest(),
                             api_id=private.api_id,
                             api_hash=private.api_hash,
-                            use_ipv6=True,
                             update_workers=4,
-                            spawn_read_thread=False,
-                            connection_mode=ConnectionMode.TCP_OBFUSCATED)
+                            report_errors=False,
+                            connection=ConnectionTcpObfuscated)
     client.session.report_errors = False
     client.start(phone=phone_num)
     print(client.get_me())
@@ -87,4 +87,9 @@ if __name__ == '__main__':
     #     print_message(entity, message.date, message.message)
 
     client.add_event_handler(handle_messages)
-    client.idle()
+    while True:
+        line = input("> ")
+        print(line)
+        if line == "stop":
+            client.disconnect()
+            exit(0)

@@ -5,7 +5,7 @@ setup(
     version='0.1',
     packages=[],
     install_requires=[
-        'Telethon>=0.19',
+        'Telethon>=0.19.0.1',
         'pyaes>=1.6.1',
         'pyasn1>=0.4.2',
         'rsa>=3.4.2'
