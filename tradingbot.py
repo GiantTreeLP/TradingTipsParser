@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import datetime
 import hashlib
 import re
@@ -9,7 +11,7 @@ from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, Updat
     Chat
 
 # Import api_id and api_hash from private.py
-# Provide that file on your own
+# Provide that file on your own or use constants
 import private
 
 
